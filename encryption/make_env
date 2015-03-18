@@ -1,0 +1,16 @@
+.PHONY: _pwd_prompt decrypt encrypt
+
+CONF_FILE=config/env.txt
+
+# 'private' task for echoing instructions
+_pwd_prompt:
+	@echo "Contact samir@datafit.io for the password."
+
+# to create config/env.txt
+decrypt: _pwd_prompt
+	openssl cast5-cbc -d -in ${CONF_FILE}.cast5 -out ${CONF_FILE}
+	chmod 600 ${CONF_FILE}
+
+# for updating config/env.txt
+encrypt: _pwd_prompt
+	openssl cast5-cbc -e -in ${CONF_FILE} -out ${CONF_FILE}.cast5

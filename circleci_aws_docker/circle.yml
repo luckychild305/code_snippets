@@ -1,0 +1,27 @@
+machine:
+   node:
+      version: 0.10.28
+   python:
+      version: 2.7.3
+   services:
+      - docker
+
+dependencies:
+   override:
+      - pip install awscli
+      - npm install
+      - docker build -t luckychild305/researchurl .
+
+test:
+   pre:
+      - docker run -d -p 3000:3000 luckychild305/researchurl
+
+deployment:
+  master:
+    branch: master
+    commands:
+      - sed "s/<EMAIL>/$DOCKER_EMAIL/;s/<AUTH>/$DOCKER_AUTH/" < .dockercfg.template > ~/.dockercfg
+      - docker tag luckychild305/researchurl luckychild305/researchurl:$CIRCLE_SHA1
+      - docker push luckychild305/researchurl:$CIRCLE_SHA1:
+         timeout: 600
+      - bash -x eb-deploy.sh $CIRCLE_SHA1
